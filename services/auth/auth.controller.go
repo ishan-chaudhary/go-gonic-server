@@ -34,23 +34,27 @@ func Login(c *gin.Context) {
 
 	if err := c.BindJSON(&body); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	user := &user.User{}
 	if err := db.DataStore.Collection("user").FindOne(ctx, bson.M{"username": body.UserName}).Decode(&user); err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User Not found"})
+		return
 	}
 
 	if user == nil || !user.IsCorrectPassword(body.Password) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Password Incorrect"})
+		return
 	}
 
 	token, err := JWTManager.Manager.Generate(user)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Error while creating token"})
+		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"user": user, token: token})
+	c.IndentedJSON(http.StatusOK, gin.H{"user": user, "token": token})
 }
 
 func Signup(c *gin.Context) {
@@ -62,6 +66,7 @@ func Signup(c *gin.Context) {
 
 	if err := c.BindJSON(&body); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	user, err := user.NewUser(body.UserName, body.Password, body.Role)
@@ -69,15 +74,19 @@ func Signup(c *gin.Context) {
 	res, err := db.DataStore.Collection("user").InsertOne(ctx, user)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
+
 	oid, ok := res.InsertedID.(primitive.ObjectID)
 	if !ok {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("can not convert to oid %v", err)})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("can not convert to oid %v", err)})
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"username": body.UserName, "Id": oid.Hex()})
 }
 
 func CheckAuth(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Auth Working"})
+	user := c.GetString("User")
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Auth Working", "user": user})
 }

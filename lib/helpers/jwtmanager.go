@@ -22,6 +22,7 @@ func (manager *JWTManager) Generate(user *user.User) (string, error) {
 		},
 		Username: user.Username,
 		Role:     user.Role,
+		ID:       user.ID.Hex(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

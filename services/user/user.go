@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,6 +17,7 @@ func NewUser(username string, password string, role string) (*User, error) {
 		Username:       username,
 		HashedPassword: string(hashedPassword),
 		Role:           role,
+		ID:             primitive.NewObjectID(),
 	}
 
 	return user, nil
