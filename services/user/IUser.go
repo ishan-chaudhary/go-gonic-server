@@ -8,3 +8,8 @@ type User struct {
 	HashedPassword string             `bson:"password"`
 	Role           string             `bson:"role"`
 }
+
+type UserPublic struct {
+	ID       primitive.ObjectID `bson:"_id",omitempty`
+	Username string             `bson:"username"`
+}

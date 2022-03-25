@@ -19,7 +19,7 @@ func main() {
 		fmt.Println("MongoDB Connection Closed")
 	}()
 
-	JWTManager.NewJWTManager("Ishan", time.Minute*5)
+	JWTManager.NewJWTManager("Ishan", time.Hour*50)
 
 	router := gin.Default()
 	ApplyRoutes(router)

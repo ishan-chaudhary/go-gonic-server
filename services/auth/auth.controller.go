@@ -15,12 +15,12 @@ import (
 )
 
 type loginBody struct {
-	UserName string `json:"username"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 type signUpBody struct {
-	UserName string `json:"username"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 	Role     string `json:"role"`
 }
@@ -38,7 +38,7 @@ func Login(c *gin.Context) {
 	}
 
 	user := &user.User{}
-	if err := db.DataStore.Collection("user").FindOne(ctx, bson.M{"username": body.UserName}).Decode(&user); err != nil {
+	if err := db.DataStore.Collection("user").FindOne(ctx, bson.M{"username": body.Username}).Decode(&user); err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User Not found"})
 		return
 	}
@@ -69,7 +69,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	user, err := user.NewUser(body.UserName, body.Password, body.Role)
+	user, err := user.NewUser(body.Username, body.Password, body.Role)
 
 	res, err := db.DataStore.Collection("user").InsertOne(ctx, user)
 	if err != nil {
@@ -82,7 +82,7 @@ func Signup(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("can not convert to oid %v", err)})
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"username": body.UserName, "Id": oid.Hex()})
+	c.IndentedJSON(http.StatusOK, gin.H{"username": body.Username, "Id": oid.Hex()})
 }
 
 func CheckAuth(c *gin.Context) {
