@@ -21,6 +21,10 @@ type TrainBody struct {
 	Stations    []string `json:"stations"`
 }
 
+func init() {
+	db.ConnectDB()
+}
+
 func createNewTrain(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
